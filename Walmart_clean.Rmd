@@ -1,0 +1,87 @@
+---
+title: "walmart_clean"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+features <- read.table("~/walmart_features.csv", 
+                       header = TRUE,
+                       sep = ",")
+                  
+sample <- read.table("~/walmart_sample.csv", 
+                       header = TRUE,
+                       sep = ",")
+
+stores <- read.table("~/walmart_stores.csv", 
+                       header = TRUE,
+                       sep = ",")
+
+train <- read.table("~/walmart_train.csv", 
+                       header = TRUE,
+                       sep = ",")
+
+test <- read.table("~/walmart_test.csv", 
+                       header = TRUE,
+                       sep = ",")
+
+
+summary(train)
+
+
+head(test, n=5)
+
+install.packages('dplyr')
+library(dplyr)
+
+## Train set
+
+join_tbl_train <- inner_join(train, features, by = c("Store", "Date", "IsHoliday"), copy = FALSE)
+
+full_join_tbl_train <- inner_join(join_tbl_train, stores, by = "Store", copy = FALSE)
+
+head(join_tbl, n=5)
+
+summary(full_join_tbl_train)
+
+full_join_tbl_train = full_join_tbl_train[, !(colnames(full_join_tbl_train) %in% c("MarkDown1", "MarkDown2", "MarkDown3", "MarkDown4", "MarkDown5"))]
+
+full_join_tbl_train = full_join_tbl_train[, !(colnames(full_join_tbl_train) %in% c("X.x", "index.x", "X.y", "index.y"))]
+
+full_join_tbl_train = full_join_tbl_train[, !(colnames(full_join_tbl_train) %in% c("Temperature", "Fuel_Price", "IsHoliday", "CPI", "Unemployment"))]
+
+full_join_tbl_train = full_join_tbl_train[, !(colnames(full_join_tbl_train) %in% c("X", "index", "Type", "Size"))]
+
+head(full_join_tbl_train, n=5)
+
+which(is.na(full_join_tbl_train)) 
+
+## No null values
+
+
+## Test set
+
+join_tbl_test <- inner_join(test, features, by = c("Store", "Date", "IsHoliday"), copy = FALSE)
+
+full_join_tbl_test <- inner_join(join_tbl_test, stores, by = "Store", copy = FALSE)
+
+full_join_tbl_test = full_join_tbl_test[, !(colnames(full_join_tbl_test) %in% c("MarkDown1", "MarkDown2", "MarkDown3", "MarkDown4", "MarkDown5"))]
+
+full_join_tbl_test = full_join_tbl_test[, !(colnames(full_join_tbl_test) %in% c("X.x", "index.x", "X.y", "index.y"))]
+
+full_join_tbl_test = full_join_tbl_test[, !(colnames(full_join_tbl_test) %in% c("Temperature", "Fuel_Price", "IsHoliday", "CPI", "Unemployment"))]
+
+full_join_tbl_test = full_join_tbl_test[, !(colnames(full_join_tbl_test) %in% c("X", "index", "Type", "Size"))]
+
+head(full_join_tbl_test, n=5)
+
+which(is.na(full_join_tbl_test)) 
+
+## No null values
+
+write.csv(full_join_tbl_train, "MSteele_cleaned_walmart_train.csv",row.names=F)
+
+write.csv(full_join_tbl_test, "MSteele_cleaned_walmart_test.csv",row.names=F)
